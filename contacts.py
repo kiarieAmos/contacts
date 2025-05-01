@@ -7,6 +7,14 @@ class Contacts:
         self.root = root
         self.create_left_icon()     ## calling the function for the left icon
         self.create_label_frame()   ## calling the function for the labelframe.
+        self.create_message_area()  ## calling the message function.
+        self.create_tree_view()     ## calling the tree view function
+
+        ## start of styling.##
+
+        ttk.style = ttk.Style()
+        ttk.style.configure('Treeview', font = ('helvetica', 10))
+        ttk.style.configure('Treeview.Heading', font = ('helvetica', 12, 'bold'))
     
     def create_left_icon(self):
         photo = PhotoImage(file='icons/logo.png')
@@ -27,6 +35,17 @@ class Contacts:
         self.numfield = Entry(labelframe)
         self.numfield.grid(row = 3, column = 2, padx = 5, pady = 2, sticky = 'w')
         Button(labelframe, text = 'Add Contact', command = '', bg = 'blue', fg = 'white').grid(row = 4, column = 2, padx = 5, pady = 5, sticky = E)
+
+    def create_message_area(self):
+        self.message = Label(text = '', fg = 'red')
+        self.message.grid(row = 3, column = 1, sticky = W)
+
+    def create_tree_view(self):
+        self.tree = ttk.Treeview(height = 10, columns = ('email', 'number'), style = 'Treeview')
+        self.tree.grid(row = 6, column = 0, columnspan = 3)
+        self.tree.heading('#0', text = 'Name', anchor = W)
+        self.tree.heading("email", text = 'Email Address', anchor = W)
+        self.tree.heading("number", text = 'Contact Number', anchor = W)
 
 
 if __name__ == '__main__':
