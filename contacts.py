@@ -5,17 +5,23 @@ from tkinter import Tk, Button, Label, PhotoImage, LabelFrame, W, E, N, S,Entry,
 class Contacts:
     def __init__(self, root):
         self.root = root
-        self.create_left_icon()     ## calling the function for the left icon
-        self.create_label_frame()   ## calling the function for the labelframe.
-        self.create_message_area()  ## calling the message function.
-        self.create_tree_view()     ## calling the tree view function
+        self.create_gui()
 
         ## start of styling.##
 
         ttk.style = ttk.Style()
         ttk.style.configure('Treeview', font = ('helvetica', 10))
         ttk.style.configure('Treeview.Heading', font = ('helvetica', 12, 'bold'))
-    
+
+    def create_gui(self):
+        self.create_left_icon()             ## calling the function for the left icon
+        self.create_label_frame()           ## calling the function for the labelframe.
+        self.create_message_area()          ## calling the message function.
+        self.create_tree_view()             ## calling the tree view function
+        self.create_bottom_buttons()        ## calling the bottom buttons function
+        self.create_scrollbar()             ## calling the scrollbar function
+
+
     def create_left_icon(self):
         photo = PhotoImage(file='icons/logo.png')
         label = Label(image=photo)
@@ -46,6 +52,14 @@ class Contacts:
         self.tree.heading('#0', text = 'Name', anchor = W)
         self.tree.heading("email", text = 'Email Address', anchor = W)
         self.tree.heading("number", text = 'Contact Number', anchor = W)
+
+    def create_scrollbar(self):
+        self.scrollbar = Scrollbar(orient = 'vertical', command = self.tree.yview)
+        self.scrollbar.grid(row = 6, column = 3, rowspan = 10, sticky = 'sn')
+
+    def create_bottom_buttons(self):
+        Button(text = "Delete Selected", command = '', bg = 'red', fg = 'white').grid(row = 8, column = 0, sticky = W, pady = 10, padx = 20)
+        Button(text = 'Modify Selected', command = '', bg = 'purple', fg = 'white').grid(row = 8, column = 1, sticky = W)
 
 
 if __name__ == '__main__':
