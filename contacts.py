@@ -71,7 +71,7 @@ class Contacts:
 
     def create_bottom_buttons(self):
         Button(text = "Delete Selected", command = self.on_delete_selected_button_clicked, bg = 'red', fg = 'white').grid(row = 8, column = 0, sticky = W, pady = 10, padx = 20)
-        Button(text = 'Modify Selected', command = '', bg = 'purple', fg = 'white').grid(row = 8, column = 1, sticky = E)
+        Button(text = 'Modify Selected', command = self.on_modify_selected_button_clicked, bg = 'purple', fg = 'white').grid(row = 8, column = 1, sticky = E)
 
     def on_add_contact_button_clicked(self):
         self.add_new_contact()
@@ -117,6 +117,43 @@ class Contacts:
         query = 'DELETE FROM contacts_list WHERE name = ?'
         self.execute_db_query(query, (name,))
         self.message['text'] = 'Contacts for {} deleted'.format(name)
+        self.view_contacts()
+
+    def on_modify_selected_button_clicked(self):
+        self.message['text'] = ''
+        try:
+            self.tree.item(self.tree.selection())['values'][0]
+        except IndexError as e:
+            self.message['text'] = 'No Item Selected To Modify'
+            return
+        self.open_modify_window()
+
+    def open_modify_window(self):
+        name = self.tree.item(self.tree.selection())['text']
+        old_number = self.tree.item(self.tree.selection())['values'][1]
+        self.transient = Toplevel(self.root)  # Create an instance of Toplevel, with the main window as the parent
+        self.transient.title('Update Contact Number')
+        Label(self.transient, text = 'Name: ').grid(row = 0, column = 1)
+        Entry(self.transient, textvariable = StringVar(self.transient, value = name), state = 'readonly').grid(row = 0, column = 2)
+        Label(self.transient, text = 'Old Contact Number: ').grid(row = 1, column = 1)
+        Entry(self.transient, textvariable = StringVar(self.transient, value = old_number), state = 'readonly').grid(row = 1, column = 2)
+
+        Label(self.transient, text = 'New Phone Number: ').grid(row = 2, column = 1)
+        new_phone_number_entry_widget = Entry(self.transient)
+        new_phone_number_entry_widget.grid(row = 2, column = 2)
+
+        Button(self.transient, text = 'Update Contact', command = lambda: self.update_contacts(
+            new_phone_number_entry_widget.get(), old_number, name
+        )).grid(row = 3, column = 2, sticky = E)
+
+        ##self.transient.mainloop()  ##Gemini thinks that root.mainloop is enough
+
+    def update_contacts(self, new_phone, old_phone, name):
+        query = 'UPDATE contacts_list SET number = ? WHERE number = ? and name = ?'
+        parameters = (new_phone, old_phone, name)
+        self.execute_db_query(query, parameters)
+        self.transient.destroy()
+        self.message['text'] = 'Phone Number of {} modified'.format(name)
         self.view_contacts()
 
 
