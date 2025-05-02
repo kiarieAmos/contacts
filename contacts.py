@@ -1,8 +1,10 @@
 ### Importing all the needed modules from tkinter
 from tkinter import ttk
 from tkinter import Tk, Button, Label, PhotoImage, LabelFrame, W, E, N, S,Entry, END, StringVar, Scrollbar, Toplevel
+import sqlite3              ## module for database interaction.
 
 class Contacts:
+    db_filename = 'contacts.db'  ### A variable that stores the database filename.
     def __init__(self, root):
         self.root = root
         self.create_gui()
@@ -12,6 +14,15 @@ class Contacts:
         ttk.style = ttk.Style()
         ttk.style.configure('Treeview', font = ('helvetica', 10))
         ttk.style.configure('Treeview.Heading', font = ('helvetica', 12, 'bold'))
+
+    def execute_db_query(self, query, parameters = ()):
+        with sqlite3.connect(self.db_filename) as conn:
+            print(conn)
+            print('You have successfully connected to the database.')
+            cursor = conn.cursor()
+            query_result = cursor.execute(query, parameters)
+            conn.commit()
+        return query_result
 
     def create_gui(self):
         self.create_left_icon()             ## calling the function for the left icon
@@ -59,7 +70,7 @@ class Contacts:
 
     def create_bottom_buttons(self):
         Button(text = "Delete Selected", command = '', bg = 'red', fg = 'white').grid(row = 8, column = 0, sticky = W, pady = 10, padx = 20)
-        Button(text = 'Modify Selected', command = '', bg = 'purple', fg = 'white').grid(row = 8, column = 1, sticky = W)
+        Button(text = 'Modify Selected', command = '', bg = 'purple', fg = 'white').grid(row = 8, column = 1, sticky = E)
 
 
 if __name__ == '__main__':
