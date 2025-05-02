@@ -63,13 +63,14 @@ class Contacts:
         self.tree.heading('#0', text = 'Name', anchor = W)
         self.tree.heading("email", text = 'Email Address', anchor = W)
         self.tree.heading("number", text = 'Contact Number', anchor = W)
+        self.view_contacts()  ## I added this
 
     def create_scrollbar(self):
         self.scrollbar = Scrollbar(orient = 'vertical', command = self.tree.yview)
         self.scrollbar.grid(row = 6, column = 3, rowspan = 10, sticky = 'sn')
 
     def create_bottom_buttons(self):
-        Button(text = "Delete Selected", command = '', bg = 'red', fg = 'white').grid(row = 8, column = 0, sticky = W, pady = 10, padx = 20)
+        Button(text = "Delete Selected", command = self.on_delete_selected_button_clicked, bg = 'red', fg = 'white').grid(row = 8, column = 0, sticky = W, pady = 10, padx = 20)
         Button(text = 'Modify Selected', command = '', bg = 'purple', fg = 'white').grid(row = 8, column = 1, sticky = E)
 
     def on_add_contact_button_clicked(self):
@@ -84,6 +85,7 @@ class Contacts:
             self.namefield.delete(0, END)
             self.emailfield.delete(0, END)
             self.numfield.delete(0, END)
+            self.view_contacts()
         else:
             self.message['text'] = 'Name Email and Number cannot be blank'
         self.view_contacts()
@@ -99,6 +101,24 @@ class Contacts:
         contact_entries = self.execute_db_query(query)
         for row in contact_entries:
             self.tree.insert('', 0, text=row[1], values=(row[2], row[3]))
+
+    def on_delete_selected_button_clicked(self):
+        self.message['text'] = ''
+        try:
+            self.tree.item(self.tree.selection())['values'][0]
+        except IndexError as e:
+            self.message['text'] = 'No Item Selected to delete'
+            return
+        self.delete_contacts()
+
+    def delete_contacts(self):
+        self.message['text'] = ''
+        name = self.tree.item(self.tree.selection())['text']
+        query = 'DELETE FROM contacts_list WHERE name = ?'
+        self.execute_db_query(query, (name,))
+        self.message['text'] = 'Contacts for {} deleted'.format(name)
+        self.view_contacts()
+
 
 
 if __name__ == '__main__':
