@@ -51,7 +51,7 @@ class Contacts:
         Label(labelframe, text = 'Number', bg = 'black', fg = 'white').grid(row = 3, column = 1, padx = 15, pady = 2, sticky = W)
         self.numfield = Entry(labelframe)
         self.numfield.grid(row = 3, column = 2, padx = 5, pady = 2, sticky = 'w')
-        Button(labelframe, text = 'Add Contact', command = '', bg = 'blue', fg = 'white').grid(row = 4, column = 2, padx = 5, pady = 5, sticky = E)
+        Button(labelframe, text = 'Add Contact', command = self.on_add_contact_button_clicked, bg = 'blue', fg = 'white').grid(row = 4, column = 2, padx = 5, pady = 5, sticky = E)
 
     def create_message_area(self):
         self.message = Label(text = '', fg = 'red')
@@ -71,6 +71,34 @@ class Contacts:
     def create_bottom_buttons(self):
         Button(text = "Delete Selected", command = '', bg = 'red', fg = 'white').grid(row = 8, column = 0, sticky = W, pady = 10, padx = 20)
         Button(text = 'Modify Selected', command = '', bg = 'purple', fg = 'white').grid(row = 8, column = 1, sticky = E)
+
+    def on_add_contact_button_clicked(self):
+        self.add_new_contact()
+
+    def add_new_contact(self):
+        if self.new_contacts_validated():
+            query = 'INSERT INTO contacts_list VALUES(NULL,?,?,?)'
+            parameters = (self.namefield.get(), self.emailfield.get(), self.numfield.get())
+            self.execute_db_query(query, parameters)
+            self.message['text'] = 'New Contact {} added'.format(self.namefield.get())
+            self.namefield.delete(0, END)
+            self.emailfield.delete(0, END)
+            self.numfield.delete(0, END)
+        else:
+            self.message['text'] = 'Name Email and Number cannot be blank'
+        self.view_contacts()
+    
+    def new_contacts_validated(self):
+        return len(self.namefield.get()) != 0 and len(self.emailfield.get()) !=0 and len(self.numfield.get()) != 0
+
+    def view_contacts(self):
+        items = self.tree.get_children()  ## returns a list of items ids one for each child i.e a dictionary for a given item.
+        for item in items:
+            self.tree.delete(item)
+        query = 'SELECT * FROM contacts_list ORDER BY name DESC'
+        contact_entries = self.execute_db_query(query)
+        for row in contact_entries:
+            self.tree.insert('', 0, text=row[1], values=(row[2], row[3]))
 
 
 if __name__ == '__main__':
