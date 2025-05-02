@@ -161,5 +161,7 @@ class Contacts:
 if __name__ == '__main__':
     root = Tk()
     root.title('My Contacts List')
+    root.geometry('650x450')
+    root.resizable(width=False, height=False)
     application = Contacts(root)
     root.mainloop()
